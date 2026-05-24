@@ -273,14 +273,6 @@
       font-weight: 600;
     }
     .chip .sub { font-size: .7rem; opacity: .55; font-weight: 400; }
-    .chip .who-link {
-      font-size: .65rem;
-      color: inherit;
-      opacity: .5;
-      text-decoration: none;
-      margin-left: .1rem;
-    }
-    .chip .who-link:hover { opacity: .9; }
 
     /* Volume input */
     .volume-row {
@@ -534,23 +526,12 @@
             onclick="pickChip(this)">
             <span id="chip-70">70°C</span>
             <span class="sub">(first bubbles)</span>
-            <a class="who-link" href="https://www.who.int/publications/i/item/safe-preparation-storage-and-handling-of-powdered-infant-formula"
-               target="_blank" rel="noopener noreferrer"
-               onclick="event.stopPropagation()" title="WHO/FAO: Safe preparation of powdered infant formula">ⓘ</a>
           </button>
           <button class="chip" data-param="T0" data-value="100"
             onclick="pickChip(this)">
             <span id="chip-100">100°C</span>
             <span class="sub">(full boil)</span>
           </button>
-          <button class="chip" data-param="T0" data-value="custom"
-            onclick="pickChip(this)">Custom</button>
-        </div>
-        <div id="custom-t0-row" class="volume-row" style="display:none">
-          <input class="volume-input" type="number" id="custom-t0-input"
-            min="38" max="150" step="1" value="70"
-            oninput="setParam('customT0', Math.max(38, Math.min(150, +this.value || 70)))">
-          <span class="volume-unit">°C</span>
         </div>
       </div>
 
@@ -561,6 +542,14 @@
             onclick="pickChip(this)">Fridge <span class="sub" id="chip-fridge">(5°C)</span></button>
           <button class="chip active" data-param="T_env" data-value="20"
             onclick="pickChip(this)">Tap <span class="sub" id="chip-tap">(20°C)</span></button>
+          <button class="chip" data-param="T_env" data-value="custom"
+            onclick="pickChip(this)">Custom</button>
+        </div>
+        <div id="custom-tenv-row" class="volume-row" style="display:none">
+          <input class="volume-input" type="number" id="custom-tenv-input"
+            min="0" max="35" step="1" value="20"
+            oninput="setParam('customTenv', Math.max(0, Math.min(35, +this.value || 20)))">
+          <span class="volume-unit">°C</span>
         </div>
       </div>
 
@@ -630,7 +619,9 @@ A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
     300 W m⁻² K⁻¹), the net conductance U·A is about 27 % <em>lower</em> than a still
     submerged bath — making running tap the slowest water option. Sitting in air is slower still.</p>
 
-    <h3>Why 70 °C?</h3>
+    <h3>Why 70 °C? <a href="https://www.who.int/publications/i/item/safe-preparation-storage-and-handling-of-powdered-infant-formula"
+      target="_blank" rel="noopener noreferrer" title="WHO/FAO: Safe preparation of powdered infant formula"
+      style="font-weight:400;font-size:.8em;letter-spacing:0;text-transform:none">ⓘ</a></h3>
     <p>The <a href="https://www.who.int/publications/i/item/safe-preparation-storage-and-handling-of-powdered-infant-formula"
     target="_blank" rel="noopener noreferrer">WHO/FAO <em>Safe preparation, storage and handling
     of powdered infant formula</em></a> guidelines — specifically about reconstituted
@@ -681,7 +672,7 @@ A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
     material:     'glass',
     bottleSize:   'standard',
     customRadius: 3.5,
-    customT0:     70,
+    customTenv:   20,
     T0:           70,
     T_env:        20,
     bathType:     'submerge',
@@ -708,8 +699,8 @@ A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
 
   // ── Physics ───────────────────────────────────────────────────────────────
   function calcSecs(params, targetC) {
-    const { volume, material, bottleSize, T0: T0raw, customT0, T_env, bathType } = params;
-    const T0 = T0raw === 'custom' ? (customT0 ?? 70) : T0raw;
+    const { volume, material, bottleSize, T0, customTenv, T_env: T_envRaw, bathType } = params;
+    const T_env = T_envRaw === 'custom' ? (customTenv ?? 20) : T_envRaw;
     if (T0 <= targetC || T_env >= targetC) return null;
 
     const V   = volume * 1e-6;
@@ -775,11 +766,11 @@ A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
     document.getElementById('sitting-note').style.display =
       state.bathType === 'sitting' ? 'block' : 'none';
 
-    // Custom radius input visibility
+    // Custom inputs visibility
     document.getElementById('custom-radius-row').style.display =
       state.bottleSize === 'custom' ? 'flex' : 'none';
-    document.getElementById('custom-t0-row').style.display =
-      state.T0 === 'custom' ? 'flex' : 'none';
+    document.getElementById('custom-tenv-row').style.display =
+      state.T_env === 'custom' ? 'flex' : 'none';
 
     renderProfiles();
     drawGraph();
@@ -890,7 +881,7 @@ A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
   function syncUI() {
     document.getElementById('vol-input').value = state.volume;
     document.getElementById('custom-radius-input').value = state.customRadius;
-    document.getElementById('custom-t0-input').value = state.customT0;
+    document.getElementById('custom-tenv-input').value = state.customTenv;
     document.querySelectorAll('.chip[data-param]').forEach(chip => {
       chip.classList.toggle('active',
         String(chip.dataset.value) === String(state[chip.dataset.param]));
@@ -932,8 +923,8 @@ A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
     const ph = cssH - mt - mb;
 
     // Physics
-    const T0c   = state.T0 === 'custom' ? state.customT0 : state.T0;
-    const Tenvc = state.T_env;
+    const T0c   = state.T0;
+    const Tenvc = state.T_env === 'custom' ? state.customTenv : state.T_env;
     const V     = state.volume * 1e-6;
     const r     = state.bottleSize === 'custom'
                     ? state.customRadius / 100
