@@ -425,7 +425,6 @@
     @media (max-width: 620px) {
       #cool-graph { height: 190px; }
       .main-layout     { display: contents; }
-      .profiles        { order: 1; }
       .params-panel    { order: 2; }
       .save-section    { order: 3; }
       .time-panel      { order: 4; }
@@ -459,9 +458,6 @@
 
 <div class="container">
 
-  <!-- Profile chips -->
-  <div class="profiles" id="profiles-el"></div>
-
   <!-- Main 2-col layout -->
   <div class="main-layout">
 
@@ -472,6 +468,9 @@
         <div class="time-value" id="time-37"></div>
         <div class="time-sublabel" id="lbl-37"></div>
       </div>
+
+      <!-- Profile chips -->
+      <div class="profiles" id="profiles-el"></div>
 
       <div id="running-warn" class="warning-note" style="display:none">
         ⚠️ Running tap cools only the sides — no bottom contact. A still-water bath is
