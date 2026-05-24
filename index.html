@@ -513,6 +513,14 @@
             onclick="pickChip(this)">Premy <span class="sub">(r = 3 cm)</span></button>
           <button class="chip active" data-param="bottleSize" data-value="standard"
             onclick="pickChip(this)">Avg <span class="sub">(r = 3.5 cm)</span></button>
+          <button class="chip" data-param="bottleSize" data-value="custom"
+            onclick="pickChip(this)">Custom</button>
+        </div>
+        <div id="custom-radius-row" class="volume-row" style="display:none">
+          <input class="volume-input" type="number" id="custom-radius-input"
+            min="1" max="10" step="0.5" value="3.5"
+            oninput="setParam('customRadius', Math.max(1, Math.min(10, +this.value || 3.5)))">
+          <span class="volume-unit">cm radius</span>
         </div>
       </div>
 
@@ -645,12 +653,13 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
 <script>
   // ── Constants & defaults ─────────────────────────────────────────────────
   const DEFAULTS = {
-    volume:     200,
-    material:   'glass',
-    bottleSize: 'standard',
-    T0:         70,
-    T_env:      20,
-    bathType:   'submerge',
+    volume:       200,
+    material:     'glass',
+    bottleSize:   'standard',
+    customRadius: 3.5,
+    T0:           70,
+    T_env:        20,
+    bathType:     'submerge',
   };
 
   const MAT = {
@@ -677,7 +686,7 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     if (T0 <= targetC || T_env >= targetC) return null;
 
     const V   = volume * 1e-6;
-    const r   = BOTTLE_R[bottleSize];
+    const r   = bottleSize === 'custom' ? state.customRadius / 100 : BOTTLE_R[bottleSize];
     const { d, k } = MAT[material];
     const h_o = BATH_HO[bathType];
 
@@ -749,6 +758,10 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     // Running tap warning
     document.getElementById('running-warn').style.display =
       state.bathType === 'running' ? 'block' : 'none';
+
+    // Custom radius input visibility
+    document.getElementById('custom-radius-row').style.display =
+      state.bottleSize === 'custom' ? 'flex' : 'none';
 
     renderProfiles();
   }
@@ -856,6 +869,7 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
 
   function syncUI() {
     document.getElementById('vol-input').value = state.volume;
+    document.getElementById('custom-radius-input').value = state.customRadius;
     document.querySelectorAll('.chip[data-param]').forEach(chip => {
       chip.classList.toggle('active',
         String(chip.dataset.value) === String(state[chip.dataset.param]));
