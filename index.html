@@ -424,6 +424,13 @@
     }
     @media (max-width: 620px) {
       #cool-graph { height: 190px; }
+      .main-layout     { display: contents; }
+      .profiles        { order: 1; }
+      .params-panel    { order: 2; }
+      .save-section    { order: 3; }
+      .time-panel      { order: 4; }
+      .graph-card      { order: 5; }
+      .physics-section { order: 6; }
     }
   </style>
 </head>
@@ -473,8 +480,8 @@
 
       <div id="sitting-note" class="warning-note"
            style="display:none; background:#f0f9ff; border-color:#bae6fd; color:#0c4a6e">
-        ℹ️ Sitting in room air is slow — only the sides lose heat (bottom is on the counter).
-        Expect <strong>60–90 min</strong> in typical indoor conditions. Use water to cool faster.
+        ℹ️ Sitting in room air is slow — the sides and top lose heat but the bottom rests on the counter.
+        Expect <strong>45–75 min</strong> in typical indoor conditions. Use water to cool faster.
       </div>
     </div>
 
@@ -612,12 +619,13 @@
     <div class="formula">1/U  =  1/h_i  +  d/k  +  1/h_o</div>
 
     <h3>Effective surface area A (cylindrical bottle, radius r)</h3>
-    <div class="formula">A_total  =  2V/r + 2πr²     (sides + bottom cap)
-A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
-    <p>With running tap water the bottle is lopsided so the bottom never contacts the flow.
-    This removes ≈ 35 % of the area. Although flowing water has a higher h_o (800 vs
-    300 W m⁻² K⁻¹), the net conductance U·A is about 27 % <em>lower</em> than a still
-    submerged bath — making running tap the slowest water option. Sitting in air is slower still.</p>
+    <div class="formula">A_submerge  =  2V/r + 2πr²   (sides + both caps)
+A_sitting   =  2V/r + πr²    (sides + top cap; bottom rests on counter)
+A_running   =  2V/r          (sides only; no bottom or top contact with flow)</div>
+    <p>With running tap water the bottle is held under the flow so neither the bottom nor the
+    top cap contacts the stream — only the cylindrical sides are wetted. Although flowing water
+    has a higher h_o (800 vs 300 W m⁻² K⁻¹), the net conductance U·A is about 32 % <em>lower</em>
+    than a still submerged bath — making running tap the slowest water option.</p>
 
     <h3>Why 70 °C? <a href="https://www.who.int/publications/i/item/safe-preparation-storage-and-handling-of-powdered-infant-formula"
       target="_blank" rel="noopener noreferrer" title="WHO/FAO: Safe preparation of powdered infant formula"
@@ -709,9 +717,9 @@ A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
     const h_o = BATH_HO[bathType];
 
     const U   = 1 / (1/H_I + d/k + 1/h_o);
-    const A   = (bathType === 'running' || bathType === 'sitting')
-                  ? 2*V/r
-                  : 2*V/r + 2*Math.PI*r*r;
+    const A   = bathType === 'running' ? 2*V/r
+              : bathType === 'sitting' ? 2*V/r + Math.PI*r*r
+              :                          2*V/r + 2*Math.PI*r*r;
     const tau = RHO_CP * V / (U * A);
     return tau * Math.log((T0 - T_env) / (targetC - T_env));
   }
@@ -932,9 +940,9 @@ A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
     const { d, k } = MAT[state.material];
     const h_o   = BATH_HO[state.bathType];
     const U     = 1 / (1/H_I + d/k + 1/h_o);
-    const A     = (state.bathType === 'running' || state.bathType === 'sitting')
-                    ? 2*V/r
-                    : 2*V/r + 2*Math.PI*r*r;
+    const A     = state.bathType === 'running' ? 2*V/r
+                : state.bathType === 'sitting' ? 2*V/r + Math.PI*r*r
+                :                                2*V/r + 2*Math.PI*r*r;
     const tau   = RHO_CP * V / (U * A);
     const t37   = calcSecs(state, 37);
 
