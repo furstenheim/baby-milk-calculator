@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baby Milk Cooling Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f4f2ff;
+      --card:      #ffffff;
+      --primary:   #6366f1;
+      --pri-dark:  #4f46e5;
+      --pri-light: #eef2ff;
+      --text:      #1e1b4b;
+      --muted:     #6b7280;
+      --border:    #e5e7eb;
+      --warn-bg:   #fff7ed;
+      --warn-bdr:  #fed7aa;
+      --warn-txt:  #9a3412;
+      --radius:    14px;
+      --shadow:    0 1px 4px rgba(99,102,241,.08), 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 4rem;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .65rem 1.25rem;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+
+    .github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      text-decoration: none;
+      color: var(--text);
+      font-size: .8125rem;
+      font-weight: 600;
+      padding: .3rem .75rem;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .github-link:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+
+    .unit-toggle {
+      display: flex;
+      background: var(--bg);
+      border-radius: 999px;
+      padding: 2px;
+      border: 1.5px solid var(--border);
+      gap: 2px;
+    }
+    .unit-toggle button {
+      border: none;
+      background: transparent;
+      padding: .2rem .55rem;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s;
+    }
+    .unit-toggle button.active { background: var(--primary); color: white; }
+
+    /* ── Container ───────────────────────────────────────────────────────── */
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ── Profile chips ───────────────────────────────────────────────────── */
+    .profiles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      align-items: center;
+    }
+
+    .profile-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      padding: .35rem 1rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      font-family: inherit;
+      font-size: .8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .profile-chip:hover { border-color: var(--primary); color: var(--primary); }
+    .profile-chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+    .profile-chip.no-click { cursor: default; }
+    .profile-chip.no-click:hover { border-color: var(--primary); color: white; }
+
+    .chip-del {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,.25);
+      color: white;
+      font-size: .6rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s, background .15s;
+      padding: 0;
+      line-height: 1;
+    }
+    .profile-chip:hover .chip-del,
+    .profile-chip.active .chip-del { opacity: 1; }
+    .chip-del:hover { background: rgba(255,255,255,.45); }
+
+    /* ── Main layout ─────────────────────────────────────────────────────── */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    @media (max-width: 620px) {
+      .main-layout { grid-template-columns: 1fr; }
+    }
+
+    /* ── Time panel ──────────────────────────────────────────────────────── */
+    .time-panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 2rem 1.75rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .time-primary { text-align: center; }
+
+    .time-eyebrow {
+      font-size: .6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: .5rem;
+    }
+
+    .time-value {
+      font-size: 3.25rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      letter-spacing: -.02em;
+      min-height: 3.5rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: .2rem;
+      flex-wrap: wrap;
+    }
+    .time-value .num { display: inline; }
+    .time-value .lbl {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--primary);
+      opacity: .7;
+      margin-right: .25rem;
+    }
+    .time-value .ready-txt { font-size: 1.5rem; color: #16a34a; }
+    .time-value .na-txt { font-size: 2rem; color: var(--muted); }
+
+    .time-sublabel {
+      font-size: .8125rem;
+      color: var(--muted);
+      margin-top: .5rem;
+    }
+    .time-sublabel strong { color: var(--text); }
+
+    .time-divider { height: 1px; background: var(--border); }
+
+    .time-secondary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .sec-label { font-size: .875rem; color: var(--muted); }
+    .sec-value {
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .sec-value .lbl {
+      font-size: .75rem;
+      font-weight: 500;
+      opacity: .6;
+      margin-right: .15rem;
+    }
+
+    .warning-note {
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-bdr);
+      border-radius: 8px;
+      padding: .6rem .85rem;
+      font-size: .75rem;
+      color: var(--warn-txt);
+      line-height: 1.5;
+    }
+
+    /* ── Params panel ────────────────────────────────────────────────────── */
+    .params-panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .param-group {
+      display: flex;
+      flex-direction: column;
+      gap: .45rem;
+    }
+
+    .param-label {
+      font-size: .6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .25rem;
+      padding: .38rem .85rem;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      font-family: inherit;
+      font-size: .8rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text);
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: var(--primary); color: var(--primary); }
+    .chip.active {
+      background: var(--pri-light);
+      border-color: var(--primary);
+      color: var(--pri-dark);
+      font-weight: 600;
+    }
+    .chip .sub { font-size: .7rem; opacity: .55; font-weight: 400; }
+    .chip .who-link {
+      font-size: .65rem;
+      color: inherit;
+      opacity: .5;
+      text-decoration: none;
+      margin-left: .1rem;
+    }
+    .chip .who-link:hover { opacity: .9; }
+
+    /* Volume input */
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .volume-input {
+      width: 85px;
+      padding: .38rem .6rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .volume-input:focus { border-color: var(--primary); }
+    .volume-unit { font-size: .8125rem; color: var(--muted); font-weight: 500; }
+
+    /* ── Save section ────────────────────────────────────────────────────── */
+    .save-section {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.5rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      flex-wrap: wrap;
+    }
+    .save-lbl { font-size: .8125rem; color: var(--muted); white-space: nowrap; font-weight: 500; }
+    .save-input {
+      flex: 1;
+      min-width: 140px;
+      padding: .4rem .75rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .8125rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .save-input:focus { border-color: var(--primary); }
+    .save-input.invalid { border-color: #ef4444; }
+    .save-btn {
+      padding: .42rem 1.2rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    .save-btn:hover { background: var(--pri-dark); }
+
+    /* ── Physics section ─────────────────────────────────────────────────── */
+    .physics-section {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
+    .physics-section h2 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+    }
+    .physics-section h3 {
+      font-size: .875rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 1.25rem 0 .4rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .physics-section p {
+      font-size: .875rem;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: .4rem;
+    }
+    .physics-section a { color: var(--primary); }
+    .formula {
+      background: var(--bg);
+      border-left: 3px solid var(--primary);
+      border-radius: 0 8px 8px 0;
+      padding: .65rem 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: .8125rem;
+      color: var(--text);
+      margin: .5rem 0;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .ptable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .8rem;
+      margin-top: .75rem;
+    }
+    .ptable th {
+      text-align: left;
+      padding: .4rem .65rem;
+      background: var(--bg);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .ptable td {
+      padding: .4rem .65rem;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .ptable td:first-child { color: var(--muted); }
+    .ptable tr:hover td { background: var(--bg); }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="https://github.com/furstenheim/baby-milk-calculator"
+     class="github-link" target="_blank" rel="noopener noreferrer">
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+        0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+        -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
+        .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
+        -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0
+        1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82
+        1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01
+        1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+    </svg>
+    ⭐ Star on GitHub
+  </a>
+  <div class="unit-toggle">
+    <button id="btn-c" class="active" onclick="setUnit('C')">°C</button>
+    <button id="btn-f" onclick="setUnit('F')">°F</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Profile chips -->
+  <div class="profiles" id="profiles-el"></div>
+
+  <!-- Main 2-col layout -->
+  <div class="main-layout">
+
+    <!-- LEFT: time display -->
+    <div class="time-panel">
+      <div class="time-primary">
+        <div class="time-eyebrow">Ready in</div>
+        <div class="time-value" id="time-37"></div>
+        <div class="time-sublabel" id="lbl-37"></div>
+      </div>
+
+      <div class="time-divider"></div>
+
+      <div class="time-secondary">
+        <span class="sec-label">Warm — <span id="lbl-39-temp"></span></span>
+        <span class="sec-value" id="time-39"></span>
+      </div>
+
+      <div id="running-warn" class="warning-note" style="display:none">
+        ⚠️ Running tap cools only the sides — no bottom contact. A still-water bath is
+        actually <strong>faster</strong> despite the lower flow rate.
+      </div>
+    </div>
+
+    <!-- RIGHT: parameters -->
+    <div class="params-panel">
+
+      <div class="param-group">
+        <div class="param-label">Volume</div>
+        <div class="volume-row">
+          <input class="volume-input" type="number" id="vol-input"
+            min="30" max="450" step="10" value="200"
+            oninput="setParam('volume', Math.max(30, Math.min(450, +this.value || 30)))">
+          <span class="volume-unit">mL</span>
+        </div>
+      </div>
+
+      <div class="param-group">
+        <div class="param-label">Material</div>
+        <div class="chip-row" data-group="material">
+          <button class="chip active" data-param="material" data-value="glass"
+            onclick="pickChip(this)">Glass</button>
+          <button class="chip" data-param="material" data-value="plastic"
+            onclick="pickChip(this)">Plastic</button>
+        </div>
+      </div>
+
+      <div class="param-group">
+        <div class="param-label">Bottle size</div>
+        <div class="chip-row" data-group="bottleSize">
+          <button class="chip" data-param="bottleSize" data-value="preterm"
+            onclick="pickChip(this)">Premy <span class="sub">(r = 3 cm)</span></button>
+          <button class="chip active" data-param="bottleSize" data-value="standard"
+            onclick="pickChip(this)">Avg <span class="sub">(r = 3.5 cm)</span></button>
+        </div>
+      </div>
+
+      <div class="param-group">
+        <div class="param-label">Starting temperature</div>
+        <div class="chip-row" data-group="T0">
+          <button class="chip active" data-param="T0" data-value="70"
+            onclick="pickChip(this)">
+            <span id="chip-70">70°C</span>
+            <span class="sub">(first bubbles)</span>
+            <a class="who-link" href="https://www.who.int/publications/i/item/9789241548151"
+               target="_blank" rel="noopener noreferrer"
+               onclick="event.stopPropagation()" title="WHO safe formula preparation guidelines">ⓘ</a>
+          </button>
+          <button class="chip" data-param="T0" data-value="100"
+            onclick="pickChip(this)">
+            <span id="chip-100">100°C</span>
+            <span class="sub">(full boil)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="param-group">
+        <div class="param-label">Bath temperature</div>
+        <div class="chip-row" data-group="T_env">
+          <button class="chip" data-param="T_env" data-value="5"
+            onclick="pickChip(this)">Fridge <span class="sub" id="chip-fridge">(5°C)</span></button>
+          <button class="chip active" data-param="T_env" data-value="20"
+            onclick="pickChip(this)">Tap <span class="sub" id="chip-tap">(20°C)</span></button>
+        </div>
+      </div>
+
+      <div class="param-group">
+        <div class="param-label">Bath type</div>
+        <div class="chip-row" data-group="bathType">
+          <button class="chip active" data-param="bathType" data-value="submerge"
+            onclick="pickChip(this)">Submerge</button>
+          <button class="chip" data-param="bathType" data-value="running"
+            onclick="pickChip(this)">Running tap</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Save section -->
+  <div class="save-section">
+    <span class="save-lbl">Save as:</span>
+    <input class="save-input" id="save-name" type="text"
+      value="my baby bottle" placeholder="profile name"
+      oninput="this.classList.remove('invalid')">
+    <button class="save-btn" onclick="saveProfile()">Save profile</button>
+  </div>
+
+  <!-- Physics explanation -->
+  <section class="physics-section">
+    <h2>How the calculation works</h2>
+
+    <p>We treat the milk as a single uniform temperature (lumped thermal mass) that loses
+    heat exponentially toward the bath. Three thermal resistances sit in series between the
+    milk and the cooling water.</p>
+
+    <h3>Newton's Law of Cooling</h3>
+    <p>The energy balance on the milk:</p>
+    <div class="formula">ρ · V · c_p · dT/dt  =  −U · A · (T − T_env)</div>
+    <p>This ODE has the closed-form solution:</p>
+    <div class="formula">T(t)  =  T_env + (T₀ − T_env) · exp(−t / τ)</div>
+
+    <h3>Time to reach a target temperature</h3>
+    <p>Inverting the exponential gives the formula used for every result on this page:</p>
+    <div class="formula">t*  =  τ · ln[ (T₀ − T_env) / (T_target − T_env) ]</div>
+
+    <h3>Time constant τ</h3>
+    <div class="formula">τ  =  ρ · V · c_p  /  (U · A)</div>
+    <p><em>ρ · V · c_p</em> is the thermal mass of the milk.
+    <em>U · A</em> is the total thermal conductance between milk and bath.</p>
+
+    <h3>Overall heat-transfer coefficient U</h3>
+    <p>Three resistances in series — inner convection (milk → wall), wall conduction, outer
+    convection (wall → bath water):</p>
+    <div class="formula">1/U  =  1/h_i  +  d/k  +  1/h_o</div>
+
+    <h3>Effective surface area A (cylindrical bottle, radius r)</h3>
+    <div class="formula">A_total  =  2V/r + 2πr²     (sides + bottom cap)
+A_sides  =  2V/r            (sides only — running tap mode)</div>
+    <p>With running tap water the bottle is lopsided so the bottom never contacts the flow.
+    This removes ≈ 35 % of the area. Although flowing water has a higher h_o (800 vs
+    300 W m⁻² K⁻¹), the net conductance U·A is about 27 % <em>lower</em> than a still
+    submerged bath — making running tap the slowest option.</p>
+
+    <h3>Why 70 °C?</h3>
+    <p>The <a href="https://www.who.int/publications/i/item/9789241548151"
+    target="_blank" rel="noopener noreferrer">WHO guidelines on powdered formula
+    preparation</a> recommend using water at a minimum of 70 °C to kill
+    <em>Cronobacter sakazakii</em> and other heat-sensitive pathogens.
+    At ≈ 70 °C the first visible small bubbles appear in heating water —
+    dissolved gases nucleating on the vessel surface, not true steam boiling.</p>
+
+    <h3>Parameter values</h3>
+    <table class="ptable">
+      <thead>
+        <tr><th>Quantity</th><th>Symbol</th><th>Value</th><th>Source / notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Milk density</td><td>ρ</td><td>1030 kg m⁻³</td><td>Whole milk</td></tr>
+        <tr><td>Milk specific heat</td><td>c_p</td><td>3900 J kg⁻¹ K⁻¹</td><td>Whole milk</td></tr>
+        <tr><td>Inner convection</td><td>h_i</td><td>100 W m⁻² K⁻¹</td><td>Natural convection, still liquid</td></tr>
+        <tr><td>Outer — still bath</td><td>h_o</td><td>300 W m⁻² K⁻¹</td><td>Natural convection in water</td></tr>
+        <tr><td>Outer — running tap</td><td>h_o</td><td>800 W m⁻² K⁻¹</td><td>Falling-film correlation</td></tr>
+        <tr><td>Glass wall thickness</td><td>d</td><td>3 mm</td><td>Typical baby bottle</td></tr>
+        <tr><td>Glass conductivity</td><td>k</td><td>1.0 W m⁻¹ K⁻¹</td><td>Borosilicate glass</td></tr>
+        <tr><td>Plastic wall thickness</td><td>d</td><td>1.5 mm</td><td>Typical PP baby bottle</td></tr>
+        <tr><td>Plastic conductivity</td><td>k</td><td>0.22 W m⁻¹ K⁻¹</td><td>Polypropylene</td></tr>
+        <tr><td>Preterm bottle radius</td><td>r</td><td>3.0 cm</td><td>Narrow-neck style</td></tr>
+        <tr><td>Standard bottle radius</td><td>r</td><td>3.5 cm</td><td>Wide-neck style</td></tr>
+        <tr><td>Fridge water</td><td>T_env</td><td>5 °C</td><td>Typical domestic fridge</td></tr>
+        <tr><td>Tap water</td><td>T_env</td><td>20 °C</td><td>Room-temperature tap</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Limitations</h3>
+    <p>The lumped model assumes the milk is well-mixed (uniform temperature). In practice a
+    small gradient exists; real cool-down times may differ by ±10–20 %. The bottle neck,
+    teat and cap are ignored — they add thermal resistance and reduce the effective area
+    slightly, so actual times will tend to be a little longer than shown.</p>
+  </section>
+
+</div>
+
+<script>
+  // ── Constants & defaults ─────────────────────────────────────────────────
+  const DEFAULTS = {
+    volume:     200,
+    material:   'glass',
+    bottleSize: 'standard',
+    T0:         70,
+    T_env:      20,
+    bathType:   'submerge',
+  };
+
+  const MAT = {
+    glass:   { d: 0.003,  k: 1.00 },
+    plastic: { d: 0.0015, k: 0.22 },
+  };
+  const BOTTLE_R = { preterm: 0.030, standard: 0.035 };
+  const BATH_HO  = { submerge: 300, running: 800 };
+  const H_I      = 100;
+  const RHO_CP   = 1030 * 3900;  // J m⁻³ K⁻¹
+
+  // ── App state ─────────────────────────────────────────────────────────────
+  let state          = { ...DEFAULTS };
+  let unit           = 'C';
+  let savedProfiles  = [];   // [{name, params}]
+
+  const KEY_PARAMS   = 'bmc_params';
+  const KEY_PROFILES = 'bmc_profiles';
+  const KEY_UNIT     = 'bmc_unit';
+
+  // ── Physics ───────────────────────────────────────────────────────────────
+  function calcSecs(params, targetC) {
+    const { volume, material, bottleSize, T0, T_env, bathType } = params;
+    if (T0 <= targetC || T_env >= targetC) return null;
+
+    const V   = volume * 1e-6;
+    const r   = BOTTLE_R[bottleSize];
+    const { d, k } = MAT[material];
+    const h_o = BATH_HO[bathType];
+
+    const U   = 1 / (1/H_I + d/k + 1/h_o);
+    const A   = bathType === 'running'
+                  ? 2*V/r
+                  : 2*V/r + 2*Math.PI*r*r;
+    const tau = RHO_CP * V / (U * A);
+    return tau * Math.log((T0 - T_env) / (targetC - T_env));
+  }
+
+  // ── Formatting ─────────────────────────────────────────────────────────────
+  function cToF(c) { return Math.round(c * 9/5 + 32); }
+
+  function dispTemp(c) {
+    return unit === 'F' ? `${cToF(c)}°F` : `${c}°C`;
+  }
+
+  function timeParts(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.round(sec % 60);
+    return { m, s };
+  }
+
+  function renderBigTime(el, sec) {
+    if (sec === null) {
+      el.innerHTML = '<span class="na-txt">—</span>';
+      return;
+    }
+    if (sec <= 0) {
+      el.innerHTML = '<span class="ready-txt">ready ✓</span>';
+      return;
+    }
+    const { m, s } = timeParts(sec);
+    let html = '';
+    if (m > 0) html += `<span class="num">${m}</span><span class="lbl">min</span> `;
+    if (s > 0 || m === 0) html += `<span class="num">${s}</span><span class="lbl">sec</span>`;
+    el.innerHTML = html.trim();
+  }
+
+  function renderSmallTime(el, sec) {
+    if (sec === null) { el.innerHTML = '—'; return; }
+    if (sec <= 0) { el.innerHTML = 'ready ✓'; return; }
+    const { m, s } = timeParts(sec);
+    let html = '';
+    if (m > 0) html += `<span class="lbl"></span>${m}<span class="lbl"> min</span> `;
+    if (s > 0 || m === 0) html += `${s}<span class="lbl"> sec</span>`;
+    el.innerHTML = html.trim();
+  }
+
+  // ── Display update ────────────────────────────────────────────────────────
+  function updateDisplay() {
+    const t37 = calcSecs(state, 37);
+    const t39 = calcSecs(state, 39);
+
+    renderBigTime(document.getElementById('time-37'), t37);
+    renderSmallTime(document.getElementById('time-39'), t39);
+
+    document.getElementById('lbl-37').innerHTML =
+      `until <strong>${dispTemp(37)}</strong> &mdash; body temperature`;
+    document.getElementById('lbl-39-temp').textContent = dispTemp(39);
+
+    // Temperature chip labels
+    document.getElementById('chip-70').textContent  = dispTemp(70);
+    document.getElementById('chip-100').textContent = dispTemp(100);
+    document.getElementById('chip-fridge').textContent = `(${dispTemp(5)})`;
+    document.getElementById('chip-tap').textContent    = `(${dispTemp(20)})`;
+
+    // Running tap warning
+    document.getElementById('running-warn').style.display =
+      state.bathType === 'running' ? 'block' : 'none';
+
+    renderProfiles();
+  }
+
+  // ── Profile management ────────────────────────────────────────────────────
+  function paramsEq(a, b) {
+    return Object.keys(DEFAULTS).every(k => String(a[k]) === String(b[k]));
+  }
+
+  function activeProfileName() {
+    if (paramsEq(state, DEFAULTS)) return 'Default';
+    const hit = savedProfiles.find(p => paramsEq(state, p.params));
+    return hit ? hit.name : 'Custom';
+  }
+
+  function renderProfiles() {
+    const active = activeProfileName();
+    const el = document.getElementById('profiles-el');
+
+    const items = [
+      { name: 'Default', saved: false },
+      ...savedProfiles.map(p => ({ name: p.name, saved: true })),
+      ...(active === 'Custom' ? [{ name: 'Custom', saved: false }] : []),
+    ];
+
+    el.innerHTML = items.map(({ name, saved }) => {
+      const isActive  = name === active;
+      const isCustom  = name === 'Custom';
+      const safeName  = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+      const delBtn = saved
+        ? `<button class="chip-del" onclick="deleteProfile('${safeName}');event.stopPropagation()">✕</button>`
+        : '';
+
+      return `<button
+          class="profile-chip${isActive ? ' active' : ''}${isCustom ? ' no-click' : ''}"
+          onclick="${isCustom ? '' : `loadProfile('${safeName}')`}"
+        >${name}${delBtn}</button>`;
+    }).join('');
+  }
+
+  function loadProfile(name) {
+    if (name === 'Default') {
+      state = { ...DEFAULTS };
+    } else {
+      const p = savedProfiles.find(p => p.name === name);
+      if (!p) return;
+      state = { ...p.params };
+    }
+    syncUI();
+    persist();
+    updateDisplay();
+  }
+
+  function saveProfile() {
+    const nameEl = document.getElementById('save-name');
+    const name   = nameEl.value.trim();
+
+    if (!name || name === 'Default' || name === 'Custom') {
+      nameEl.classList.add('invalid');
+      nameEl.focus();
+      return;
+    }
+
+    const idx = savedProfiles.findIndex(p => p.name === name);
+    if (idx >= 0) {
+      savedProfiles[idx].params = { ...state };
+    } else {
+      savedProfiles.push({ name, params: { ...state } });
+    }
+
+    localStorage.setItem(KEY_PROFILES, JSON.stringify(savedProfiles));
+    updateDisplay();
+  }
+
+  function deleteProfile(name) {
+    savedProfiles = savedProfiles.filter(p => p.name !== name);
+    localStorage.setItem(KEY_PROFILES, JSON.stringify(savedProfiles));
+    if (activeProfileName() === 'Custom') {
+      state = { ...DEFAULTS };
+      syncUI();
+      persist();
+    }
+    updateDisplay();
+  }
+
+  // ── Parameter updates ─────────────────────────────────────────────────────
+  function setParam(key, value) {
+    state[key] = value;
+    persist();
+    updateDisplay();
+  }
+
+  function pickChip(btn) {
+    const key = btn.dataset.param;
+    const raw = btn.dataset.value;
+    const val = ['volume','T0','T_env'].includes(key) ? Number(raw) : raw;
+
+    btn.closest('.chip-row').querySelectorAll('.chip')
+      .forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+
+    setParam(key, val);
+  }
+
+  function syncUI() {
+    document.getElementById('vol-input').value = state.volume;
+    document.querySelectorAll('.chip[data-param]').forEach(chip => {
+      chip.classList.toggle('active',
+        String(chip.dataset.value) === String(state[chip.dataset.param]));
+    });
+  }
+
+  // ── Unit toggle ───────────────────────────────────────────────────────────
+  function setUnit(u) {
+    unit = u;
+    document.getElementById('btn-c').classList.toggle('active', u === 'C');
+    document.getElementById('btn-f').classList.toggle('active', u === 'F');
+    localStorage.setItem(KEY_UNIT, u);
+    updateDisplay();
+  }
+
+  // ── Persistence ───────────────────────────────────────────────────────────
+  function persist() {
+    localStorage.setItem(KEY_PARAMS, JSON.stringify(state));
+  }
+
+  function boot() {
+    try {
+      const sp = localStorage.getItem(KEY_PROFILES);
+      if (sp) savedProfiles = JSON.parse(sp);
+
+      const sc = localStorage.getItem(KEY_PARAMS);
+      if (sc) state = { ...DEFAULTS, ...JSON.parse(sc) };
+
+      const su = localStorage.getItem(KEY_UNIT);
+      if (su === 'F' || su === 'C') unit = su;
+    } catch (_) {}
+
+    document.getElementById('btn-c').classList.toggle('active', unit === 'C');
+    document.getElementById('btn-f').classList.toggle('active', unit === 'F');
+    syncUI();
+    updateDisplay();
+  }
+
+  boot();
+</script>
+</body>
+</html>
