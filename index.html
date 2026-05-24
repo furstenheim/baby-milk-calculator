@@ -520,7 +520,7 @@
         <div class="param-label">Bottle size</div>
         <div class="chip-row" data-group="bottleSize">
           <button class="chip" data-param="bottleSize" data-value="preterm"
-            onclick="pickChip(this)">Premy <span class="sub">(r = 3 cm)</span></button>
+            onclick="pickChip(this)">Premy <span class="sub">(r = 1.5 cm)</span></button>
           <button class="chip active" data-param="bottleSize" data-value="standard"
             onclick="pickChip(this)">Avg <span class="sub">(r = 3.5 cm)</span></button>
           <button class="chip" data-param="bottleSize" data-value="custom"
@@ -665,7 +665,7 @@ A_running   =  2V/r          (sides only; no bottom or top contact with flow)</d
         <tr><td>Glass conductivity</td><td>k</td><td>1.0 W m⁻¹ K⁻¹</td><td>Borosilicate glass</td></tr>
         <tr><td>Plastic wall thickness</td><td>d</td><td>1.5 mm</td><td>Typical PP baby bottle</td></tr>
         <tr><td>Plastic conductivity</td><td>k</td><td>0.22 W m⁻¹ K⁻¹</td><td>Polypropylene</td></tr>
-        <tr><td>Preterm bottle radius</td><td>r</td><td>3.0 cm</td><td>Narrow-neck style</td></tr>
+        <tr><td>Preterm bottle radius</td><td>r</td><td>1.5 cm</td><td>Narrow-neck style</td></tr>
         <tr><td>Standard bottle radius</td><td>r</td><td>3.5 cm</td><td>Wide-neck style</td></tr>
         <tr><td>Fridge water</td><td>T_env</td><td>5 °C</td><td>Typical domestic fridge</td></tr>
         <tr><td>Tap water</td><td>T_env</td><td>20 °C</td><td>Typical domestic tap</td></tr>
@@ -698,7 +698,7 @@ A_running   =  2V/r          (sides only; no bottom or top contact with flow)</d
     glass:   { d: 0.003,  k: 1.00 },
     plastic: { d: 0.0015, k: 0.22 },
   };
-  const BOTTLE_R = { preterm: 0.030, standard: 0.035 };
+  const BOTTLE_R = { preterm: 0.015, standard: 0.035 };
   const BATH_HO  = { submerge: 300, running: 800, sitting: 20 };
   const H_I      = 100;
   const RHO_CP   = 1030 * 3900;  // J m⁻³ K⁻¹
