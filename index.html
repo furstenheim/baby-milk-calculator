@@ -208,28 +208,6 @@
     }
     .time-sublabel strong { color: var(--text); }
 
-    .time-divider { height: 1px; background: var(--border); }
-
-    .time-secondary {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-    }
-    .sec-label { font-size: .875rem; color: var(--muted); }
-    .sec-value {
-      font-size: 1.375rem;
-      font-weight: 700;
-      color: var(--text);
-      white-space: nowrap;
-    }
-    .sec-value .lbl {
-      font-size: .75rem;
-      font-weight: 500;
-      opacity: .6;
-      margin-right: .15rem;
-    }
-
     .warning-note {
       background: var(--warn-bg);
       border: 1px solid var(--warn-bdr);
@@ -496,13 +474,6 @@
         <div class="time-sublabel" id="lbl-37"></div>
       </div>
 
-      <div class="time-divider"></div>
-
-      <div class="time-secondary">
-        <span class="sec-label">Warm — <span id="lbl-39-temp"></span></span>
-        <span class="sec-value" id="time-39"></span>
-      </div>
-
       <div id="running-warn" class="warning-note" style="display:none">
         ⚠️ Running tap cools only the sides — no bottom contact. A still-water bath is
         actually <strong>faster</strong> despite the lower flow rate.
@@ -510,8 +481,8 @@
 
       <div id="sitting-note" class="warning-note"
            style="display:none; background:#f0f9ff; border-color:#bae6fd; color:#0c4a6e">
-        ℹ️ Sitting in room air is very slow — only the sides radiate heat
-        (bottom is on the counter). Expect <strong>2–3 hours</strong>. Use water when possible.
+        ℹ️ Sitting in room air is slow — only the sides lose heat (bottom is on the counter).
+        Expect <strong>60–90 min</strong> in typical indoor conditions. Use water to cool faster.
       </div>
     </div>
 
@@ -563,9 +534,9 @@
             onclick="pickChip(this)">
             <span id="chip-70">70°C</span>
             <span class="sub">(first bubbles)</span>
-            <a class="who-link" href="https://www.who.int/publications/i/item/9789241548151"
+            <a class="who-link" href="https://www.who.int/publications/i/item/safe-preparation-storage-and-handling-of-powdered-infant-formula"
                target="_blank" rel="noopener noreferrer"
-               onclick="event.stopPropagation()" title="WHO safe formula preparation guidelines">ⓘ</a>
+               onclick="event.stopPropagation()" title="WHO/FAO: Safe preparation of powdered infant formula">ⓘ</a>
           </button>
           <button class="chip" data-param="T0" data-value="100"
             onclick="pickChip(this)">
@@ -645,18 +616,22 @@
 
     <h3>Effective surface area A (cylindrical bottle, radius r)</h3>
     <div class="formula">A_total  =  2V/r + 2πr²     (sides + bottom cap)
-A_sides  =  2V/r            (sides only — running tap mode)</div>
+A_sides  =  2V/r            (sides only — running tap or sitting in air)</div>
     <p>With running tap water the bottle is lopsided so the bottom never contacts the flow.
     This removes ≈ 35 % of the area. Although flowing water has a higher h_o (800 vs
     300 W m⁻² K⁻¹), the net conductance U·A is about 27 % <em>lower</em> than a still
-    submerged bath — making running tap the slowest option.</p>
+    submerged bath — making running tap the slowest water option. Sitting in air is slower still.</p>
 
     <h3>Why 70 °C?</h3>
-    <p>The <a href="https://www.who.int/publications/i/item/9789241548151"
-    target="_blank" rel="noopener noreferrer">WHO guidelines on powdered formula
-    preparation</a> recommend using water at a minimum of 70 °C to kill
-    <em>Cronobacter sakazakii</em> and other heat-sensitive pathogens.
-    At ≈ 70 °C the first visible small bubbles appear in heating water —
+    <p>The <a href="https://www.who.int/publications/i/item/safe-preparation-storage-and-handling-of-powdered-infant-formula"
+    target="_blank" rel="noopener noreferrer">WHO/FAO <em>Safe preparation, storage and handling
+    of powdered infant formula</em></a> guidelines — specifically about reconstituted
+    <em>powder</em> formula (PIF), not breast milk — recommend using water at no less than 70 °C
+    when mixing the powder (preparation step: “use water that has been boiled and cooled for no
+    more than 30 minutes so it remains at or above 70 °C”). At that temperature
+    <em>Cronobacter sakazakii</em> and <em>Salmonella</em>, which can contaminate dry formula
+    powder during manufacture, are killed.</p>
+    <p>At ≈ 70 °C the first visible small bubbles appear in heating water —
     dissolved gases nucleating on the vessel surface, not true steam boiling.</p>
 
     <h3>Parameter values</h3>
@@ -670,7 +645,7 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
         <tr><td>Inner convection</td><td>h_i</td><td>100 W m⁻² K⁻¹</td><td>Natural convection, still liquid</td></tr>
         <tr><td>Outer — still bath</td><td>h_o</td><td>300 W m⁻² K⁻¹</td><td>Natural convection in water</td></tr>
         <tr><td>Outer — running tap</td><td>h_o</td><td>800 W m⁻² K⁻¹</td><td>Falling-film correlation</td></tr>
-        <tr><td>Outer — sitting (air)</td><td>h_o</td><td>8 W m⁻² K⁻¹</td><td>Natural convection in air, vertical surface</td></tr>
+        <tr><td>Outer — sitting (air)</td><td>h_o</td><td>20 W m⁻² K⁻¹</td><td>Natural convection (~8) + radiation (~7) in indoor air; remainder for typical mild draughts</td></tr>
         <tr><td>Glass wall thickness</td><td>d</td><td>3 mm</td><td>Typical baby bottle</td></tr>
         <tr><td>Glass conductivity</td><td>k</td><td>1.0 W m⁻¹ K⁻¹</td><td>Borosilicate glass</td></tr>
         <tr><td>Plastic wall thickness</td><td>d</td><td>1.5 mm</td><td>Typical PP baby bottle</td></tr>
@@ -708,7 +683,7 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     plastic: { d: 0.0015, k: 0.22 },
   };
   const BOTTLE_R = { preterm: 0.030, standard: 0.035 };
-  const BATH_HO  = { submerge: 300, running: 800, sitting: 8 };
+  const BATH_HO  = { submerge: 300, running: 800, sitting: 20 };
   const H_I      = 100;
   const RHO_CP   = 1030 * 3900;  // J m⁻³ K⁻¹
 
@@ -769,27 +744,14 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     el.innerHTML = html.trim();
   }
 
-  function renderSmallTime(el, sec) {
-    if (sec === null) { el.innerHTML = '—'; return; }
-    if (sec <= 0) { el.innerHTML = 'ready ✓'; return; }
-    const { m, s } = timeParts(sec);
-    let html = '';
-    if (m > 0) html += `<span class="lbl"></span>${m}<span class="lbl"> min</span> `;
-    if (s > 0 || m === 0) html += `${s}<span class="lbl"> sec</span>`;
-    el.innerHTML = html.trim();
-  }
-
   // ── Display update ──────────────────────────────────────────────────────
   function updateDisplay() {
     const t37 = calcSecs(state, 37);
-    const t39 = calcSecs(state, 39);
 
     renderBigTime(document.getElementById('time-37'), t37);
-    renderSmallTime(document.getElementById('time-39'), t39);
 
     document.getElementById('lbl-37').innerHTML =
       `until <strong>${dispTemp(37)}</strong> &mdash; body temperature`;
-    document.getElementById('lbl-39-temp').textContent = dispTemp(39);
 
     // Temperature chip labels
     document.getElementById('chip-70').textContent  = dispTemp(70);
@@ -970,7 +932,6 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
                     : 2*V/r + 2*Math.PI*r*r;
     const tau   = RHO_CP * V / (U * A);
     const t37   = calcSecs(state, 37);
-    const t39   = calcSecs(state, 39);
 
     // Ranges
     const tMax  = t37 ? t37 * 1.3 : tau * 2.5;
@@ -1027,9 +988,9 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     ctx.moveTo(ml, mt); ctx.lineTo(ml, mt + ph); ctx.lineTo(ml + pw, mt + ph);
     ctx.stroke();
 
-    // ── Target reference lines ──────────────────────────────────────────────
+    // ── Target reference line (37 °C) ────────────────────────────────────────────
     ctx.font = '10px Inter, system-ui, sans-serif';
-    for (const { tc, color } of [{ tc: 39, color: '#a78bfa' }, { tc: 37, color: '#6366f1' }]) {
+    for (const { tc, color } of [{ tc: 37, color: '#6366f1' }]) {
       if (tc <= Tenvc || tc >= T0c) continue;
       const y = tcToY(tc);
       ctx.setLineDash([5, 3]);
@@ -1057,8 +1018,8 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     }
     ctx.stroke();
 
-    // ── Dots at target crossings ──────────────────────────────────────────────
-    for (const tSec of [t39, t37].filter(Boolean)) {
+    // ── Dot at 37 °C crossing ──────────────────────────────────────────────
+    for (const tSec of [t37].filter(Boolean)) {
       if (tSec > tMax * 1.01) continue;
       const tc = Tenvc + (T0c - Tenvc) * Math.exp(-tSec / tau);
       ctx.beginPath();
