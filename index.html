@@ -34,7 +34,6 @@
       padding-bottom: 4rem;
     }
 
-    /* ── Header ─────────────────────────────────────────────────────────── */
     header {
       display: flex;
       justify-content: space-between;
@@ -84,7 +83,6 @@
     }
     .unit-toggle button.active { background: var(--primary); color: white; }
 
-    /* ── Container ───────────────────────────────────────────────────────── */
     .container {
       max-width: 920px;
       margin: 0 auto;
@@ -94,7 +92,6 @@
       gap: 1.25rem;
     }
 
-    /* ── Profile chips ───────────────────────────────────────────────────── */
     .profiles {
       display: flex;
       flex-wrap: wrap;
@@ -144,7 +141,6 @@
     .profile-chip.active .chip-del { opacity: 1; }
     .chip-del:hover { background: rgba(255,255,255,.45); }
 
-    /* ── Main layout ─────────────────────────────────────────────────────── */
     .main-layout {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -155,7 +151,6 @@
       .main-layout { grid-template-columns: 1fr; }
     }
 
-    /* ── Time panel ──────────────────────────────────────────────────────── */
     .time-panel {
       background: var(--card);
       border-radius: var(--radius);
@@ -240,7 +235,6 @@
       line-height: 1.5;
     }
 
-    /* ── Params panel ────────────────────────────────────────────────────── */
     .params-panel {
       background: var(--card);
       border-radius: var(--radius);
@@ -304,7 +298,6 @@
     }
     .chip .who-link:hover { opacity: .9; }
 
-    /* Volume input */
     .volume-row {
       display: flex;
       align-items: center;
@@ -325,7 +318,6 @@
     .volume-input:focus { border-color: var(--primary); }
     .volume-unit { font-size: .8125rem; color: var(--muted); font-weight: 500; }
 
-    /* ── Save section ────────────────────────────────────────────────────── */
     .save-section {
       background: var(--card);
       border-radius: var(--radius);
@@ -366,7 +358,6 @@
     }
     .save-btn:hover { background: var(--pri-dark); }
 
-    /* ── Physics section ─────────────────────────────────────────────────── */
     .physics-section {
       background: var(--card);
       border-radius: var(--radius);
@@ -456,13 +447,10 @@
 
 <div class="container">
 
-  <!-- Profile chips -->
   <div class="profiles" id="profiles-el"></div>
 
-  <!-- Main 2-col layout -->
   <div class="main-layout">
 
-    <!-- LEFT: time display -->
     <div class="time-panel">
       <div class="time-primary">
         <div class="time-eyebrow">Ready in</div>
@@ -481,9 +469,14 @@
         ⚠️ Running tap cools only the sides — no bottom contact. A still-water bath is
         actually <strong>faster</strong> despite the lower flow rate.
       </div>
+
+      <div id="sitting-note" class="warning-note"
+           style="display:none; background:#f0f9ff; border-color:#bae6fd; color:#0c4a6e">
+        ℹ️ Sitting in room air is very slow — only the sides radiate heat
+        (bottom is on the counter). Expect <strong>2–3 hours</strong>. Use water when possible.
+      </div>
     </div>
 
-    <!-- RIGHT: parameters -->
     <div class="params-panel">
 
       <div class="param-group">
@@ -560,13 +553,14 @@
             onclick="pickChip(this)">Submerge</button>
           <button class="chip" data-param="bathType" data-value="running"
             onclick="pickChip(this)">Running tap</button>
+          <button class="chip" data-param="bathType" data-value="sitting"
+            onclick="pickChip(this)">Sitting <span class="sub">(air)</span></button>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- Save section -->
   <div class="save-section">
     <span class="save-lbl">Save as:</span>
     <input class="save-input" id="save-name" type="text"
@@ -575,7 +569,6 @@
     <button class="save-btn" onclick="saveProfile()">Save profile</button>
   </div>
 
-  <!-- Physics explanation -->
   <section class="physics-section">
     <h2>How the calculation works</h2>
 
@@ -604,12 +597,14 @@
     <div class="formula">1/U  =  1/h_i  +  d/k  +  1/h_o</div>
 
     <h3>Effective surface area A (cylindrical bottle, radius r)</h3>
-    <div class="formula">A_total  =  2V/r + 2πr²     (sides + bottom cap)
-A_sides  =  2V/r            (sides only — running tap mode)</div>
-    <p>With running tap water the bottle is lopsided so the bottom never contacts the flow.
-    This removes ≈ 35 % of the area. Although flowing water has a higher h_o (800 vs
-    300 W m⁻² K⁻¹), the net conductance U·A is about 27 % <em>lower</em> than a still
-    submerged bath — making running tap the slowest option.</p>
+    <div class="formula">A_total  =  2V/r + 2πr²     (sides + bottom cap — submerge)
+A_sides  =  2V/r            (sides only — running tap or sitting on counter)</div>
+    <p>Running tap: bottle is lopsided, bottom never contacts the flow.
+    Sitting: bottom rests on the counter, only the sides exchange heat with air.
+    Both lose ≈ 35 % of the surface area compared to full submersion.</p>
+    <p>For running tap the higher h_o (800 vs 300 W m⁻² K⁻¹) only partially compensates
+    the area loss — net U·A is still ≈ 27 % lower than a still bath.
+    For sitting (air), h_o drops to just 8 W m⁻² K⁻¹ — expect 2–3 hours.</p>
 
     <h3>Why 70 °C?</h3>
     <p>The <a href="https://www.who.int/publications/i/item/9789241548151"
@@ -630,6 +625,7 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
         <tr><td>Inner convection</td><td>h_i</td><td>100 W m⁻² K⁻¹</td><td>Natural convection, still liquid</td></tr>
         <tr><td>Outer — still bath</td><td>h_o</td><td>300 W m⁻² K⁻¹</td><td>Natural convection in water</td></tr>
         <tr><td>Outer — running tap</td><td>h_o</td><td>800 W m⁻² K⁻¹</td><td>Falling-film correlation</td></tr>
+        <tr><td>Outer — sitting (air)</td><td>h_o</td><td>8 W m⁻² K⁻¹</td><td>Natural convection in air, vertical surface</td></tr>
         <tr><td>Glass wall thickness</td><td>d</td><td>3 mm</td><td>Typical baby bottle</td></tr>
         <tr><td>Glass conductivity</td><td>k</td><td>1.0 W m⁻¹ K⁻¹</td><td>Borosilicate glass</td></tr>
         <tr><td>Plastic wall thickness</td><td>d</td><td>1.5 mm</td><td>Typical PP baby bottle</td></tr>
@@ -638,6 +634,7 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
         <tr><td>Standard bottle radius</td><td>r</td><td>3.5 cm</td><td>Wide-neck style</td></tr>
         <tr><td>Fridge water</td><td>T_env</td><td>5 °C</td><td>Typical domestic fridge</td></tr>
         <tr><td>Tap water</td><td>T_env</td><td>20 °C</td><td>Room-temperature tap</td></tr>
+        <tr><td>Room air</td><td>T_env</td><td>(same as bath temp selector)</td><td>Used for sitting mode</td></tr>
       </tbody>
     </table>
 
@@ -651,7 +648,6 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
 </div>
 
 <script>
-  // ── Constants & defaults ─────────────────────────────────────────────────
   const DEFAULTS = {
     volume:       200,
     material:     'glass',
@@ -667,20 +663,18 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     plastic: { d: 0.0015, k: 0.22 },
   };
   const BOTTLE_R = { preterm: 0.030, standard: 0.035 };
-  const BATH_HO  = { submerge: 300, running: 800 };
+  const BATH_HO  = { submerge: 300, running: 800, sitting: 8 };
   const H_I      = 100;
-  const RHO_CP   = 1030 * 3900;  // J m⁻³ K⁻¹
+  const RHO_CP   = 1030 * 3900;
 
-  // ── App state ─────────────────────────────────────────────────────────────
-  let state          = { ...DEFAULTS };
-  let unit           = 'C';
-  let savedProfiles  = [];   // [{name, params}]
+  let state         = { ...DEFAULTS };
+  let unit          = 'C';
+  let savedProfiles = [];
 
   const KEY_PARAMS   = 'bmc_params';
   const KEY_PROFILES = 'bmc_profiles';
   const KEY_UNIT     = 'bmc_unit';
 
-  // ── Physics ───────────────────────────────────────────────────────────────
   function calcSecs(params, targetC) {
     const { volume, material, bottleSize, T0, T_env, bathType } = params;
     if (T0 <= targetC || T_env >= targetC) return null;
@@ -691,35 +685,23 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     const h_o = BATH_HO[bathType];
 
     const U   = 1 / (1/H_I + d/k + 1/h_o);
-    const A   = bathType === 'running'
+    const A   = (bathType === 'running' || bathType === 'sitting')
                   ? 2*V/r
                   : 2*V/r + 2*Math.PI*r*r;
     const tau = RHO_CP * V / (U * A);
     return tau * Math.log((T0 - T_env) / (targetC - T_env));
   }
 
-  // ── Formatting ─────────────────────────────────────────────────────────────
   function cToF(c) { return Math.round(c * 9/5 + 32); }
-
-  function dispTemp(c) {
-    return unit === 'F' ? `${cToF(c)}°F` : `${c}°C`;
-  }
+  function dispTemp(c) { return unit === 'F' ? `${cToF(c)}°F` : `${c}°C`; }
 
   function timeParts(sec) {
-    const m = Math.floor(sec / 60);
-    const s = Math.round(sec % 60);
-    return { m, s };
+    return { m: Math.floor(sec / 60), s: Math.round(sec % 60) };
   }
 
   function renderBigTime(el, sec) {
-    if (sec === null) {
-      el.innerHTML = '<span class="na-txt">—</span>';
-      return;
-    }
-    if (sec <= 0) {
-      el.innerHTML = '<span class="ready-txt">ready ✓</span>';
-      return;
-    }
+    if (sec === null) { el.innerHTML = '<span class="na-txt">—</span>'; return; }
+    if (sec <= 0)     { el.innerHTML = '<span class="ready-txt">ready ✓</span>'; return; }
     const { m, s } = timeParts(sec);
     let html = '';
     if (m > 0) html += `<span class="num">${m}</span><span class="lbl">min</span> `;
@@ -729,15 +711,14 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
 
   function renderSmallTime(el, sec) {
     if (sec === null) { el.innerHTML = '—'; return; }
-    if (sec <= 0) { el.innerHTML = 'ready ✓'; return; }
+    if (sec <= 0)     { el.innerHTML = 'ready ✓'; return; }
     const { m, s } = timeParts(sec);
     let html = '';
-    if (m > 0) html += `<span class="lbl"></span>${m}<span class="lbl"> min</span> `;
+    if (m > 0) html += `${m}<span class="lbl"> min</span> `;
     if (s > 0 || m === 0) html += `${s}<span class="lbl"> sec</span>`;
     el.innerHTML = html.trim();
   }
 
-  // ── Display update ────────────────────────────────────────────────────────
   function updateDisplay() {
     const t37 = calcSecs(state, 37);
     const t39 = calcSecs(state, 39);
@@ -749,24 +730,22 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
       `until <strong>${dispTemp(37)}</strong> &mdash; body temperature`;
     document.getElementById('lbl-39-temp').textContent = dispTemp(39);
 
-    // Temperature chip labels
     document.getElementById('chip-70').textContent  = dispTemp(70);
     document.getElementById('chip-100').textContent = dispTemp(100);
     document.getElementById('chip-fridge').textContent = `(${dispTemp(5)})`;
     document.getElementById('chip-tap').textContent    = `(${dispTemp(20)})`;
 
-    // Running tap warning
     document.getElementById('running-warn').style.display =
       state.bathType === 'running' ? 'block' : 'none';
+    document.getElementById('sitting-note').style.display =
+      state.bathType === 'sitting' ? 'block' : 'none';
 
-    // Custom radius input visibility
     document.getElementById('custom-radius-row').style.display =
       state.bottleSize === 'custom' ? 'flex' : 'none';
 
     renderProfiles();
   }
 
-  // ── Profile management ────────────────────────────────────────────────────
   function paramsEq(a, b) {
     return Object.keys(DEFAULTS).every(k => String(a[k]) === String(b[k]));
   }
@@ -788,18 +767,16 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     ];
 
     el.innerHTML = items.map(({ name, saved }) => {
-      const isActive  = name === active;
-      const isCustom  = name === 'Custom';
-      const safeName  = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-
-      const delBtn = saved
-        ? `<button class="chip-del" onclick="deleteProfile('${safeName}');event.stopPropagation()">✕</button>`
+      const isActive = name === active;
+      const isCustom = name === 'Custom';
+      const safe     = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      const del      = saved
+        ? `<button class="chip-del" onclick="deleteProfile('${safe}');event.stopPropagation()">✕</button>`
         : '';
-
       return `<button
           class="profile-chip${isActive ? ' active' : ''}${isCustom ? ' no-click' : ''}"
-          onclick="${isCustom ? '' : `loadProfile('${safeName}')`}"
-        >${name}${delBtn}</button>`;
+          onclick="${isCustom ? '' : `loadProfile('${safe}')`}"
+        >${name}${del}</button>`;
     }).join('');
   }
 
@@ -811,28 +788,18 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
       if (!p) return;
       state = { ...p.params };
     }
-    syncUI();
-    persist();
-    updateDisplay();
+    syncUI(); persist(); updateDisplay();
   }
 
   function saveProfile() {
     const nameEl = document.getElementById('save-name');
     const name   = nameEl.value.trim();
-
     if (!name || name === 'Default' || name === 'Custom') {
-      nameEl.classList.add('invalid');
-      nameEl.focus();
-      return;
+      nameEl.classList.add('invalid'); nameEl.focus(); return;
     }
-
     const idx = savedProfiles.findIndex(p => p.name === name);
-    if (idx >= 0) {
-      savedProfiles[idx].params = { ...state };
-    } else {
-      savedProfiles.push({ name, params: { ...state } });
-    }
-
+    if (idx >= 0) savedProfiles[idx].params = { ...state };
+    else savedProfiles.push({ name, params: { ...state } });
     localStorage.setItem(KEY_PROFILES, JSON.stringify(savedProfiles));
     updateDisplay();
   }
@@ -840,30 +807,20 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
   function deleteProfile(name) {
     savedProfiles = savedProfiles.filter(p => p.name !== name);
     localStorage.setItem(KEY_PROFILES, JSON.stringify(savedProfiles));
-    if (activeProfileName() === 'Custom') {
-      state = { ...DEFAULTS };
-      syncUI();
-      persist();
-    }
+    if (activeProfileName() === 'Custom') { state = { ...DEFAULTS }; syncUI(); persist(); }
     updateDisplay();
   }
 
-  // ── Parameter updates ─────────────────────────────────────────────────────
   function setParam(key, value) {
-    state[key] = value;
-    persist();
-    updateDisplay();
+    state[key] = value; persist(); updateDisplay();
   }
 
   function pickChip(btn) {
     const key = btn.dataset.param;
     const raw = btn.dataset.value;
     const val = ['volume','T0','T_env'].includes(key) ? Number(raw) : raw;
-
-    btn.closest('.chip-row').querySelectorAll('.chip')
-      .forEach(c => c.classList.remove('active'));
+    btn.closest('.chip-row').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
-
     setParam(key, val);
   }
 
@@ -876,7 +833,6 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     });
   }
 
-  // ── Unit toggle ───────────────────────────────────────────────────────────
   function setUnit(u) {
     unit = u;
     document.getElementById('btn-c').classList.toggle('active', u === 'C');
@@ -885,7 +841,6 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     updateDisplay();
   }
 
-  // ── Persistence ───────────────────────────────────────────────────────────
   function persist() {
     localStorage.setItem(KEY_PARAMS, JSON.stringify(state));
   }
@@ -894,14 +849,11 @@ A_sides  =  2V/r            (sides only — running tap mode)</div>
     try {
       const sp = localStorage.getItem(KEY_PROFILES);
       if (sp) savedProfiles = JSON.parse(sp);
-
       const sc = localStorage.getItem(KEY_PARAMS);
       if (sc) state = { ...DEFAULTS, ...JSON.parse(sc) };
-
       const su = localStorage.getItem(KEY_UNIT);
       if (su === 'F' || su === 'C') unit = su;
     } catch (_) {}
-
     document.getElementById('btn-c').classList.toggle('active', unit === 'C');
     document.getElementById('btn-f').classList.toggle('active', unit === 'F');
     syncUI();
