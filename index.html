@@ -34,6 +34,7 @@
       padding-bottom: 4rem;
     }
 
+    /* ── Header ────────────────────────────────────────────────────── */
     header {
       display: flex;
       justify-content: space-between;
@@ -83,6 +84,7 @@
     }
     .unit-toggle button.active { background: var(--primary); color: white; }
 
+    /* ── Container ──────────────────────────────────────────────────── */
     .container {
       max-width: 920px;
       margin: 0 auto;
@@ -92,6 +94,7 @@
       gap: 1.25rem;
     }
 
+    /* ── Profile chips ────────────────────────────────────────────────── */
     .profiles {
       display: flex;
       flex-wrap: wrap;
@@ -141,6 +144,7 @@
     .profile-chip.active .chip-del { opacity: 1; }
     .chip-del:hover { background: rgba(255,255,255,.45); }
 
+    /* ── Main layout ──────────────────────────────────────────────────── */
     .main-layout {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -151,6 +155,7 @@
       .main-layout { grid-template-columns: 1fr; }
     }
 
+    /* ── Time panel ──────────────────────────────────────────────────── */
     .time-panel {
       background: var(--card);
       border-radius: var(--radius);
@@ -235,6 +240,7 @@
       line-height: 1.5;
     }
 
+    /* ── Params panel ────────────────────────────────────────────────── */
     .params-panel {
       background: var(--card);
       border-radius: var(--radius);
@@ -298,6 +304,7 @@
     }
     .chip .who-link:hover { opacity: .9; }
 
+    /* Volume input */
     .volume-row {
       display: flex;
       align-items: center;
@@ -318,6 +325,7 @@
     .volume-input:focus { border-color: var(--primary); }
     .volume-unit { font-size: .8125rem; color: var(--muted); font-weight: 500; }
 
+    /* ── Save section ────────────────────────────────────────────────── */
     .save-section {
       background: var(--card);
       border-radius: var(--radius);
@@ -358,6 +366,7 @@
     }
     .save-btn:hover { background: var(--pri-dark); }
 
+    /* ── Physics section ────────────────────────────────────────────────── */
     .physics-section {
       background: var(--card);
       border-radius: var(--radius);
@@ -420,6 +429,32 @@
     }
     .ptable td:first-child { color: var(--muted); }
     .ptable tr:hover td { background: var(--bg); }
+
+    /* ── Graph card ────────────────────────────────────────────────── */
+    .graph-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.25rem .6rem;
+      box-shadow: var(--shadow);
+    }
+    .graph-card-title {
+      font-size: .6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: .65rem;
+    }
+    #cool-graph {
+      width: 100%;
+      height: 240px;
+      display: block;
+      cursor: crosshair;
+      touch-action: pan-y;
+    }
+    @media (max-width: 620px) {
+      #cool-graph { height: 190px; }
+    }
   </style>
 </head>
 <body>
@@ -447,10 +482,13 @@
 
 <div class="container">
 
+  <!-- Profile chips -->
   <div class="profiles" id="profiles-el"></div>
 
+  <!-- Main 2-col layout -->
   <div class="main-layout">
 
+    <!-- LEFT: time display -->
     <div class="time-panel">
       <div class="time-primary">
         <div class="time-eyebrow">Ready in</div>
@@ -477,6 +515,7 @@
       </div>
     </div>
 
+    <!-- RIGHT: parameters -->
     <div class="params-panel">
 
       <div class="param-group">
@@ -561,6 +600,7 @@
     </div>
   </div>
 
+  <!-- Save section -->
   <div class="save-section">
     <span class="save-lbl">Save as:</span>
     <input class="save-input" id="save-name" type="text"
@@ -569,6 +609,13 @@
     <button class="save-btn" onclick="saveProfile()">Save profile</button>
   </div>
 
+  <!-- Cooling graph -->
+  <div class="graph-card">
+    <div class="graph-card-title">Temperature over time</div>
+    <canvas id="cool-graph"></canvas>
+  </div>
+
+  <!-- Physics explanation -->
   <section class="physics-section">
     <h2>How the calculation works</h2>
 
@@ -597,14 +644,12 @@
     <div class="formula">1/U  =  1/h_i  +  d/k  +  1/h_o</div>
 
     <h3>Effective surface area A (cylindrical bottle, radius r)</h3>
-    <div class="formula">A_total  =  2V/r + 2πr²     (sides + bottom cap — submerge)
-A_sides  =  2V/r            (sides only — running tap or sitting on counter)</div>
-    <p>Running tap: bottle is lopsided, bottom never contacts the flow.
-    Sitting: bottom rests on the counter, only the sides exchange heat with air.
-    Both lose ≈ 35 % of the surface area compared to full submersion.</p>
-    <p>For running tap the higher h_o (800 vs 300 W m⁻² K⁻¹) only partially compensates
-    the area loss — net U·A is still ≈ 27 % lower than a still bath.
-    For sitting (air), h_o drops to just 8 W m⁻² K⁻¹ — expect 2–3 hours.</p>
+    <div class="formula">A_total  =  2V/r + 2πr²     (sides + bottom cap)
+A_sides  =  2V/r            (sides only — running tap mode)</div>
+    <p>With running tap water the bottle is lopsided so the bottom never contacts the flow.
+    This removes ≈ 35 % of the area. Although flowing water has a higher h_o (800 vs
+    300 W m⁻² K⁻¹), the net conductance U·A is about 27 % <em>lower</em> than a still
+    submerged bath — making running tap the slowest option.</p>
 
     <h3>Why 70 °C?</h3>
     <p>The <a href="https://www.who.int/publications/i/item/9789241548151"
@@ -633,8 +678,7 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
         <tr><td>Preterm bottle radius</td><td>r</td><td>3.0 cm</td><td>Narrow-neck style</td></tr>
         <tr><td>Standard bottle radius</td><td>r</td><td>3.5 cm</td><td>Wide-neck style</td></tr>
         <tr><td>Fridge water</td><td>T_env</td><td>5 °C</td><td>Typical domestic fridge</td></tr>
-        <tr><td>Tap water</td><td>T_env</td><td>20 °C</td><td>Room-temperature tap</td></tr>
-        <tr><td>Room air</td><td>T_env</td><td>(same as bath temp selector)</td><td>Used for sitting mode</td></tr>
+        <tr><td>Tap water</td><td>T_env</td><td>20 °C</td><td>Typical domestic tap</td></tr>
       </tbody>
     </table>
 
@@ -648,6 +692,7 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
 </div>
 
 <script>
+  // ── Constants & defaults ─────────────────────────────────────────────
   const DEFAULTS = {
     volume:       200,
     material:     'glass',
@@ -665,16 +710,19 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
   const BOTTLE_R = { preterm: 0.030, standard: 0.035 };
   const BATH_HO  = { submerge: 300, running: 800, sitting: 8 };
   const H_I      = 100;
-  const RHO_CP   = 1030 * 3900;
+  const RHO_CP   = 1030 * 3900;  // J m⁻³ K⁻¹
 
-  let state         = { ...DEFAULTS };
-  let unit          = 'C';
-  let savedProfiles = [];
+  // ── App state ─────────────────────────────────────────────────────
+  let state          = { ...DEFAULTS };
+  let unit           = 'C';
+  let savedProfiles  = [];   // [{name, params}]
+  let graphHoverX    = null;
 
   const KEY_PARAMS   = 'bmc_params';
   const KEY_PROFILES = 'bmc_profiles';
   const KEY_UNIT     = 'bmc_unit';
 
+  // ── Physics ───────────────────────────────────────────────────────────────
   function calcSecs(params, targetC) {
     const { volume, material, bottleSize, T0, T_env, bathType } = params;
     if (T0 <= targetC || T_env >= targetC) return null;
@@ -692,16 +740,28 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
     return tau * Math.log((T0 - T_env) / (targetC - T_env));
   }
 
+  // ── Formatting ──────────────────────────────────────────────────────────
   function cToF(c) { return Math.round(c * 9/5 + 32); }
-  function dispTemp(c) { return unit === 'F' ? `${cToF(c)}°F` : `${c}°C`; }
+
+  function dispTemp(c) {
+    return unit === 'F' ? `${cToF(c)}°F` : `${c}°C`;
+  }
 
   function timeParts(sec) {
-    return { m: Math.floor(sec / 60), s: Math.round(sec % 60) };
+    const m = Math.floor(sec / 60);
+    const s = Math.round(sec % 60);
+    return { m, s };
   }
 
   function renderBigTime(el, sec) {
-    if (sec === null) { el.innerHTML = '<span class="na-txt">—</span>'; return; }
-    if (sec <= 0)     { el.innerHTML = '<span class="ready-txt">ready ✓</span>'; return; }
+    if (sec === null) {
+      el.innerHTML = '<span class="na-txt">—</span>';
+      return;
+    }
+    if (sec <= 0) {
+      el.innerHTML = '<span class="ready-txt">ready ✓</span>';
+      return;
+    }
     const { m, s } = timeParts(sec);
     let html = '';
     if (m > 0) html += `<span class="num">${m}</span><span class="lbl">min</span> `;
@@ -711,14 +771,15 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
 
   function renderSmallTime(el, sec) {
     if (sec === null) { el.innerHTML = '—'; return; }
-    if (sec <= 0)     { el.innerHTML = 'ready ✓'; return; }
+    if (sec <= 0) { el.innerHTML = 'ready ✓'; return; }
     const { m, s } = timeParts(sec);
     let html = '';
-    if (m > 0) html += `${m}<span class="lbl"> min</span> `;
+    if (m > 0) html += `<span class="lbl"></span>${m}<span class="lbl"> min</span> `;
     if (s > 0 || m === 0) html += `${s}<span class="lbl"> sec</span>`;
     el.innerHTML = html.trim();
   }
 
+  // ── Display update ──────────────────────────────────────────────────────
   function updateDisplay() {
     const t37 = calcSecs(state, 37);
     const t39 = calcSecs(state, 39);
@@ -730,22 +791,27 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
       `until <strong>${dispTemp(37)}</strong> &mdash; body temperature`;
     document.getElementById('lbl-39-temp').textContent = dispTemp(39);
 
+    // Temperature chip labels
     document.getElementById('chip-70').textContent  = dispTemp(70);
     document.getElementById('chip-100').textContent = dispTemp(100);
     document.getElementById('chip-fridge').textContent = `(${dispTemp(5)})`;
     document.getElementById('chip-tap').textContent    = `(${dispTemp(20)})`;
 
+    // Bath-type notes
     document.getElementById('running-warn').style.display =
       state.bathType === 'running' ? 'block' : 'none';
     document.getElementById('sitting-note').style.display =
       state.bathType === 'sitting' ? 'block' : 'none';
 
+    // Custom radius input visibility
     document.getElementById('custom-radius-row').style.display =
       state.bottleSize === 'custom' ? 'flex' : 'none';
 
     renderProfiles();
+    drawGraph();
   }
 
+  // ── Profile management ──────────────────────────────────────────────────
   function paramsEq(a, b) {
     return Object.keys(DEFAULTS).every(k => String(a[k]) === String(b[k]));
   }
@@ -767,16 +833,18 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
     ];
 
     el.innerHTML = items.map(({ name, saved }) => {
-      const isActive = name === active;
-      const isCustom = name === 'Custom';
-      const safe     = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-      const del      = saved
-        ? `<button class="chip-del" onclick="deleteProfile('${safe}');event.stopPropagation()">✕</button>`
+      const isActive  = name === active;
+      const isCustom  = name === 'Custom';
+      const safeName  = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+      const delBtn = saved
+        ? `<button class="chip-del" onclick="deleteProfile('${safeName}');event.stopPropagation()">✕</button>`
         : '';
+
       return `<button
           class="profile-chip${isActive ? ' active' : ''}${isCustom ? ' no-click' : ''}"
-          onclick="${isCustom ? '' : `loadProfile('${safe}')`}"
-        >${name}${del}</button>`;
+          onclick="${isCustom ? '' : `loadProfile('${safeName}')`}"
+        >${name}${delBtn}</button>`;
     }).join('');
   }
 
@@ -788,18 +856,28 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
       if (!p) return;
       state = { ...p.params };
     }
-    syncUI(); persist(); updateDisplay();
+    syncUI();
+    persist();
+    updateDisplay();
   }
 
   function saveProfile() {
     const nameEl = document.getElementById('save-name');
     const name   = nameEl.value.trim();
+
     if (!name || name === 'Default' || name === 'Custom') {
-      nameEl.classList.add('invalid'); nameEl.focus(); return;
+      nameEl.classList.add('invalid');
+      nameEl.focus();
+      return;
     }
+
     const idx = savedProfiles.findIndex(p => p.name === name);
-    if (idx >= 0) savedProfiles[idx].params = { ...state };
-    else savedProfiles.push({ name, params: { ...state } });
+    if (idx >= 0) {
+      savedProfiles[idx].params = { ...state };
+    } else {
+      savedProfiles.push({ name, params: { ...state } });
+    }
+
     localStorage.setItem(KEY_PROFILES, JSON.stringify(savedProfiles));
     updateDisplay();
   }
@@ -807,20 +885,30 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
   function deleteProfile(name) {
     savedProfiles = savedProfiles.filter(p => p.name !== name);
     localStorage.setItem(KEY_PROFILES, JSON.stringify(savedProfiles));
-    if (activeProfileName() === 'Custom') { state = { ...DEFAULTS }; syncUI(); persist(); }
+    if (activeProfileName() === 'Custom') {
+      state = { ...DEFAULTS };
+      syncUI();
+      persist();
+    }
     updateDisplay();
   }
 
+  // ── Parameter updates ─────────────────────────────────────────────────────
   function setParam(key, value) {
-    state[key] = value; persist(); updateDisplay();
+    state[key] = value;
+    persist();
+    updateDisplay();
   }
 
   function pickChip(btn) {
     const key = btn.dataset.param;
     const raw = btn.dataset.value;
     const val = ['volume','T0','T_env'].includes(key) ? Number(raw) : raw;
-    btn.closest('.chip-row').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+
+    btn.closest('.chip-row').querySelectorAll('.chip')
+      .forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
+
     setParam(key, val);
   }
 
@@ -833,6 +921,7 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
     });
   }
 
+  // ── Unit toggle ───────────────────────────────────────────────────────────
   function setUnit(u) {
     unit = u;
     document.getElementById('btn-c').classList.toggle('active', u === 'C');
@@ -841,6 +930,225 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
     updateDisplay();
   }
 
+  // ── Graph ─────────────────────────────────────────────────────────────────
+  function drawGraph() {
+    const canvas = document.getElementById('cool-graph');
+    if (!canvas) return;
+    const ctx  = canvas.getContext('2d');
+    const dpr  = window.devicePixelRatio || 1;
+    const cssW = canvas.clientWidth;
+    const cssH = canvas.clientHeight;
+    if (!cssW || !cssH) return;
+
+    const needW = Math.round(cssW * dpr);
+    const needH = Math.round(cssH * dpr);
+    if (canvas.width !== needW || canvas.height !== needH) {
+      canvas.width  = needW;
+      canvas.height = needH;
+    }
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    const ml = 54, mr = 12, mt = 16, mb = 36;
+    const pw = cssW - ml - mr;
+    const ph = cssH - mt - mb;
+
+    // Physics
+    const T0c   = state.T0;
+    const Tenvc = state.T_env;
+    const V     = state.volume * 1e-6;
+    const r     = state.bottleSize === 'custom'
+                    ? state.customRadius / 100
+                    : BOTTLE_R[state.bottleSize];
+    const { d, k } = MAT[state.material];
+    const h_o   = BATH_HO[state.bathType];
+    const U     = 1 / (1/H_I + d/k + 1/h_o);
+    const A     = (state.bathType === 'running' || state.bathType === 'sitting')
+                    ? 2*V/r
+                    : 2*V/r + 2*Math.PI*r*r;
+    const tau   = RHO_CP * V / (U * A);
+    const t37   = calcSecs(state, 37);
+    const t39   = calcSecs(state, 39);
+
+    // Ranges
+    const tMax  = t37 ? t37 * 1.3 : tau * 2.5;
+    const span  = T0c - Tenvc;
+    const padC  = span * 0.07;
+    const yMinC = Tenvc - padC;
+    const yMaxC = T0c   + padC;
+
+    const tToX  = t  => ml + (t / tMax) * pw;
+    const tcToY = tc => mt + ph * (1 - (tc - yMinC) / (yMaxC - yMinC));
+    const xToT  = x  => Math.max(0, ((x - ml) / pw) * tMax);
+    const dispT = tc => unit === 'F' ? `${cToF(tc)}°F` : `${tc.toFixed(0)}°C`;
+
+    // ── Y gridlines + labels ────────────────────────────────────────────────
+    const yStep  = span <= 30 ? 5 : span <= 70 ? 10 : 20;
+    const yFirst = Math.ceil(yMinC / yStep) * yStep;
+    ctx.font         = '10.5px Inter, system-ui, sans-serif';
+    ctx.fillStyle    = '#9ca3af';
+    ctx.textAlign    = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle  = '#f0f0f5';
+    ctx.lineWidth    = 1;
+    for (let tc = yFirst; tc <= yMaxC + 0.01; tc += yStep) {
+      const y = tcToY(tc);
+      ctx.beginPath(); ctx.moveTo(ml, y); ctx.lineTo(ml + pw, y); ctx.stroke();
+      ctx.fillText(dispT(tc), ml - 6, y);
+    }
+
+    // ── X gridlines + labels (minutes) ───────────────────────────────────────────
+    const tMaxMin = tMax / 60;
+    const xStep   = tMaxMin <= 5  ? 1
+                  : tMaxMin <= 15 ? 2
+                  : tMaxMin <= 30 ? 5
+                  : tMaxMin <= 90 ? 10
+                  : tMaxMin <= 180 ? 30
+                  : 60;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'top';
+    for (let tm = xStep; tm <= tMaxMin * 1.001; tm += xStep) {
+      const x = tToX(tm * 60);
+      if (x > ml + pw + 1) break;
+      ctx.beginPath(); ctx.moveTo(x, mt); ctx.lineTo(x, mt + ph); ctx.stroke();
+      const lbl = tm >= 60
+        ? `${tm % 60 === 0 ? tm/60 : (tm/60).toFixed(1)}h`
+        : `${tm}m`;
+      ctx.fillStyle = '#9ca3af';
+      ctx.fillText(lbl, x, mt + ph + 5);
+    }
+
+    // Axis border
+    ctx.strokeStyle = '#d1d5db';
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(ml, mt); ctx.lineTo(ml, mt + ph); ctx.lineTo(ml + pw, mt + ph);
+    ctx.stroke();
+
+    // ── Target reference lines ──────────────────────────────────────────────
+    ctx.font = '10px Inter, system-ui, sans-serif';
+    for (const { tc, color } of [{ tc: 39, color: '#a78bfa' }, { tc: 37, color: '#6366f1' }]) {
+      if (tc <= Tenvc || tc >= T0c) continue;
+      const y = tcToY(tc);
+      ctx.setLineDash([5, 3]);
+      ctx.strokeStyle = color;
+      ctx.lineWidth   = 1.5;
+      ctx.beginPath(); ctx.moveTo(ml, y); ctx.lineTo(ml + pw, y); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle    = color;
+      ctx.textAlign    = 'left';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(dispT(tc), ml + 5, y - 2);
+    }
+
+    // ── Cooling curve ─────────────────────────────────────────────────────
+    ctx.setLineDash([]);
+    ctx.strokeStyle = '#6366f1';
+    ctx.lineWidth   = 2.5;
+    ctx.lineJoin    = 'round';
+    ctx.beginPath();
+    for (let i = 0; i <= 250; i++) {
+      const t  = (tMax / 250) * i;
+      const tc = Tenvc + (T0c - Tenvc) * Math.exp(-t / tau);
+      i === 0 ? ctx.moveTo(tToX(t), tcToY(tc))
+              : ctx.lineTo(tToX(t), tcToY(tc));
+    }
+    ctx.stroke();
+
+    // ── Dots at target crossings ──────────────────────────────────────────────
+    for (const tSec of [t39, t37].filter(Boolean)) {
+      if (tSec > tMax * 1.01) continue;
+      const tc = Tenvc + (T0c - Tenvc) * Math.exp(-tSec / tau);
+      ctx.beginPath();
+      ctx.arc(tToX(tSec), tcToY(tc), 4, 0, Math.PI * 2);
+      ctx.fillStyle   = '#6366f1';
+      ctx.fill();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth   = 1.5;
+      ctx.stroke();
+    }
+
+    // ── Hover overlay ───────────────────────────────────────────────────────
+    if (graphHoverX !== null && graphHoverX >= ml && graphHoverX <= ml + pw) {
+      const t  = xToT(graphHoverX);
+      const tc = Tenvc + (T0c - Tenvc) * Math.exp(-t / tau);
+      const x  = tToX(t);
+      const y  = tcToY(tc);
+
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#6b7280';
+      ctx.lineWidth   = 1;
+      ctx.beginPath(); ctx.moveTo(x, mt); ctx.lineTo(x, mt + ph); ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fillStyle   = '#6366f1';
+      ctx.fill();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth   = 2;
+      ctx.stroke();
+
+      const m = Math.floor(t / 60);
+      const s = Math.round(t % 60);
+      const timeStr = m === 0 ? `${s}s` : s === 0 ? `${m}m` : `${m}m ${s}s`;
+      const tipText = `${dispT(tc)}  ·  ${timeStr}`;
+
+      ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+      const tw  = ctx.measureText(tipText).width;
+      const pad = 8;
+      const tipW = tw + pad * 2;
+      const tipH = 22;
+
+      let tipX = x + 12;
+      let tipY = y - tipH / 2;
+      if (tipX + tipW > ml + pw - 2) tipX = x - tipW - 12;
+      if (tipY < mt + 2)             tipY = mt + 2;
+      if (tipY + tipH > mt + ph - 2) tipY = mt + ph - tipH - 2;
+
+      ctx.fillStyle = 'rgba(30,27,75,.88)';
+      ctx.beginPath();
+      const rr = 5;
+      ctx.moveTo(tipX + rr, tipY);
+      ctx.lineTo(tipX + tipW - rr, tipY);
+      ctx.quadraticCurveTo(tipX + tipW, tipY, tipX + tipW, tipY + rr);
+      ctx.lineTo(tipX + tipW, tipY + tipH - rr);
+      ctx.quadraticCurveTo(tipX + tipW, tipY + tipH, tipX + tipW - rr, tipY + tipH);
+      ctx.lineTo(tipX + rr, tipY + tipH);
+      ctx.quadraticCurveTo(tipX, tipY + tipH, tipX, tipY + tipH - rr);
+      ctx.lineTo(tipX, tipY + rr);
+      ctx.quadraticCurveTo(tipX, tipY, tipX + rr, tipY);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle    = 'white';
+      ctx.textAlign    = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(tipText, tipX + pad, tipY + tipH / 2);
+    }
+
+    ctx.restore();
+  }
+
+  function setupGraph() {
+    const canvas = document.getElementById('cool-graph');
+    function onMove(clientX) {
+      const rect = canvas.getBoundingClientRect();
+      graphHoverX = clientX - rect.left;
+      drawGraph();
+    }
+    canvas.addEventListener('mousemove',  e => onMove(e.clientX));
+    canvas.addEventListener('mouseleave', () => { graphHoverX = null; drawGraph(); });
+    canvas.addEventListener('touchmove',  e => {
+      if (e.touches.length === 1) onMove(e.touches[0].clientX);
+    }, { passive: true });
+    canvas.addEventListener('touchend', () => { graphHoverX = null; drawGraph(); });
+    window.addEventListener('resize', drawGraph);
+  }
+
+  // ── Persistence ───────────────────────────────────────────────────────────
   function persist() {
     localStorage.setItem(KEY_PARAMS, JSON.stringify(state));
   }
@@ -849,14 +1157,18 @@ A_sides  =  2V/r            (sides only — running tap or sitting on counter)</
     try {
       const sp = localStorage.getItem(KEY_PROFILES);
       if (sp) savedProfiles = JSON.parse(sp);
+
       const sc = localStorage.getItem(KEY_PARAMS);
       if (sc) state = { ...DEFAULTS, ...JSON.parse(sc) };
+
       const su = localStorage.getItem(KEY_UNIT);
       if (su === 'F' || su === 'C') unit = su;
     } catch (_) {}
+
     document.getElementById('btn-c').classList.toggle('active', unit === 'C');
     document.getElementById('btn-f').classList.toggle('active', unit === 'F');
     syncUI();
+    setupGraph();
     updateDisplay();
   }
 
