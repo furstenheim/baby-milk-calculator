@@ -562,8 +562,8 @@
         </div>
         <div id="custom-tenv-row" class="volume-row" style="display:none">
           <input class="volume-input" type="number" id="custom-tenv-input"
-            min="0" max="35" step="1" value="20"
-            oninput="setParam('customTenv', Math.max(0, Math.min(35, +this.value || 20)))">
+            min="0" max="36" step="1" value="20"
+            oninput="const v = Math.max(0, Math.min(36, +this.value || 20)); this.value = v; setParam('customTenv', v)">
           <span class="volume-unit">°C</span>
         </div>
       </div>
