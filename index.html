@@ -208,6 +208,13 @@
     }
     .time-sublabel strong { color: var(--text); }
 
+    .time-error {
+      font-size: .8125rem;
+      color: #dc2626;
+      margin-top: .75rem;
+      line-height: 1.5;
+    }
+
     .warning-note {
       background: var(--warn-bg);
       border: 1px solid var(--warn-bdr);
@@ -476,6 +483,9 @@
         <div class="time-eyebrow">Ready in</div>
         <div class="time-value" id="time-37"></div>
         <div class="time-sublabel" id="lbl-37"></div>
+        <div class="time-error" id="time-error" style="display:none">
+          Bath temperature is at or above feeding temperature — milk cannot cool to 37&thinsp;°C in this environment.
+        </div>
       </div>
 
       <!-- Profile chips -->
@@ -562,8 +572,8 @@
         </div>
         <div id="custom-tenv-row" class="volume-row" style="display:none">
           <input class="volume-input" type="number" id="custom-tenv-input"
-            min="0" max="36" step="1" value="20"
-            oninput="const v = Math.max(0, Math.min(36, +this.value || 20)); this.value = v; setParam('customTenv', v)">
+            min="0" max="99" step="1" value="20"
+            oninput="setParam('customTenv', Math.max(0, +this.value || 0))">
           <span class="volume-unit">°C</span>
         </div>
       </div>
@@ -763,12 +773,19 @@ A_running   =  2V/r          (sides only; no bottom or top contact with flow)</d
 
   // ── Display update ──────────────────────────────────────────────────────
   function updateDisplay() {
+    const T_env = state.T_env === 'custom' ? (state.customTenv ?? 20) : state.T_env;
+    const envTooWarm = T_env >= 37;
     const t37 = calcSecs(state, 37);
 
-    renderBigTime(document.getElementById('time-37'), t37);
+    document.getElementById('time-error').style.display = envTooWarm ? 'block' : 'none';
+    document.getElementById('time-37').style.display    = envTooWarm ? 'none'  : '';
+    document.getElementById('lbl-37').style.display     = envTooWarm ? 'none'  : '';
 
-    document.getElementById('lbl-37').innerHTML =
-      `until <strong>${dispTemp(37)}</strong> &mdash; body temperature`;
+    if (!envTooWarm) {
+      renderBigTime(document.getElementById('time-37'), t37);
+      document.getElementById('lbl-37').innerHTML =
+        `until <strong>${dispTemp(37)}</strong> &mdash; body temperature`;
+    }
 
     // Temperature chip labels
     document.getElementById('chip-70').textContent  = dispTemp(70);
@@ -933,6 +950,9 @@ A_running   =  2V/r          (sides only; no bottom or top contact with flow)</d
     ctx.save();
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, cssW, cssH);
+
+    const Tenvc_check = state.T_env === 'custom' ? state.customTenv : state.T_env;
+    if (Tenvc_check >= 37) { ctx.restore(); return; }
 
     const ml = 54, mr = 12, mt = 16, mb = 36;
     const pw = cssW - ml - mr;
